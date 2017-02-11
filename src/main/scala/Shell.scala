@@ -33,7 +33,7 @@ object Shell extends App {
     var command = input.split(" ")(0)
     command.toLowerCase match {
       case "set" => set(input)
-      case "help" => help()
+      case "help" => usage()
       case "exit" => sys.exit(0)
       case _ => {
         Parser.request(input) match {
@@ -45,7 +45,7 @@ object Shell extends App {
           }
           case Right(error) => {
             println(s"\n${error}\n")
-            help()
+            usage()
           }
         }
       }
@@ -56,7 +56,7 @@ object Shell extends App {
     println("TODO")
   }
 
-  def help() {
+  def usage() {
     println("TODO")
   }
 }

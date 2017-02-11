@@ -27,41 +27,46 @@ object Parser {
   }
   
   def method(value: String) : Either[String, ParseError] = {
-    var parts = value.split(" ")
-    parts.size match {
-      case 1 => Left("GET")
-      case 2 => if (isMethod(parts(0))) Left(parts(0)) else Left("GET")
-      case 3 => if (isMethod(parts(0))) Left(parts(0)) else Right(new ParseError)
-      case _ => Right(new ParseError)
+    val position = value.split(" ")
+    val error = Right(new ParseError("HTTP method", value))
+    val default = Left("GET")
+    position.size match {
+      case 1 => default
+      case 2 => if (isMethod(position(0))) Left(position(0)) else default
+      case 3 => if (isMethod(position(0))) Left(position(0)) else error
+      case _ => error
     }
   }
  
   def path(value: String) : Either[String, ParseError] = {
-    var parts = value.split(" ")
-    parts.size match {
-      case 1 => if (isMethod(parts(0))) Right(new ParseError) else Left(parts(0))
-      case 2 => if (isMethod(parts(0))) Left(parts(1)) else Left(parts(0))
-      case 3 => Left(parts(1))
-      case _ => Right(new ParseError)
+    val position = value.split(" ")
+    var error = Right(new ParseError("path", value))
+    position.size match {
+      case 1 => if (isMethod(position(0))) error else Left(position(0))
+      case 2 => if (isMethod(position(0))) Left(position(1)) else Left(position(0))
+      case 3 => Left(position(1))
+      case _ => error
     }
   }
 
   def body(value: String) : Either[String, ParseError] = {
-    var parts = value.split(" ")
-    parts.size match {
-      case 1 => Left("")
-      case 2 => if (isMethod(parts(0))) Left("") else Left(parts(1))
-      case 3 => Left(parts(2))
-      case _ => Right(new ParseError)
+    val position = value.split(" ")
+    val error = Right(new ParseError("request body", value))
+    val default = Left("")
+    position.size match {
+      case 1 => default
+      case 2 => if (isMethod(position(0))) default else Left(position(1))
+      case 3 => Left(position(2))
+      case _ => error
     }
   }
 
   def params(value: String) : Either[Array[(String, String)], ParseError] = {
-    var parts = value.split("\\?")
-    if (parts.size == 1) {
+    var position = value.split("\\?")
+    if (position.size == 1) {
       Left(Array[(String, String)]())
     } else {
-      Left(parts(1).split("&").map(p => p.split("=")).map(p => { 
+      Left(position(1).split("&").map(p => p.split("=")).map(p => { 
         p.size match { 
           case 1 => (p(0), "true")
           case 2 => (p(0), p(1))
@@ -71,7 +76,7 @@ object Parser {
   }
 
   def isMethod(value: String) : Boolean = {
-    List("get", "put", "post", "delete", "head").contains(value.toLowerCase)
+    List("GET", "PUT", "POST", "DELETE", "HEAD").contains(value.toUpperCase)
   }
 
 }

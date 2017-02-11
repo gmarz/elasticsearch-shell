@@ -7,4 +7,4 @@ case class Error(message: String) {
 
 }
 
-class ParseError extends Error("Failed to parse the provided input.")
+class ParseError(arg: String, from: String) extends Error(s"Failed while trying to parse ${arg} from '${from}'")
