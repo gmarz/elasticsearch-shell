@@ -2,25 +2,25 @@ import scalaj.http._
 
 object Client {
 
-  def getResponse(r: Request) : HttpResponse[String] = {
+  def response(r: Request, s: Map[String, String]) : HttpResponse[String] = {
     r.method.toUpperCase match {
-      case "PUT" => put(r)
-      case "POST" => post(r)
-      case _ => request(r).asString
+      case "PUT" => put(r, s)
+      case "POST" => post(r, s)
+      case _ => request(r, s).asString
     }
   }
 
-  def request(r: Request) : HttpRequest = {
-    Http(s"http://localhost:9200/${r.path.stripPrefix("/")}")
+  private def request(r: Request, s: Map[String, String]) : HttpRequest = {
+    Http(s"${s("host")}/${r.path.stripPrefix("/")}")
       .method(r.method)
       .param("pretty", "true")
       .params(r.params)
       .header("content-type", "application/json")
   }
 
-  def put(r: Request) : HttpResponse[String] = request(r).put(r.body).asString
+  private def put(r: Request, s: Map[String, String]) : HttpResponse[String] = request(r, s).put(r.body).asString
 
-  def post(r: Request) : HttpResponse[String] = request(r).postData(r.body).asString
+  private def post(r: Request, s: Map[String, String]) : HttpResponse[String] = request(r, s).postData(r.body).asString
 
 }
 

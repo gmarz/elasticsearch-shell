@@ -2,34 +2,32 @@ import org.jline.reader._
 import org.jline.terminal._
 
 object Shell extends App {
-  var settings = scala.collection.mutable.Map[String, String]()
 
-  override def main(args: Array[String]) {
-    println("\n"
-      + """        __           __   _                                __  """ + "\n"
-      + """  ___  / /___ _ ___ / /_ (_)____ ___ ___  ___ _ ____ ____ / /  """ + "\n"
-      + """ / -_)/ // _ `/(_-</ __// // __/(_-</ -_)/ _ `// __// __// _ \ """ + "\n"
-      + """ \__//_/ \_,_//___/\__//_/ \__//___/\__/ \_,_//_/   \__//_//_/ """ + "\n\n"
-    )
+  println("\n"
+    + """        __           __   _                                __  """ + "\n"
+    + """  ___  / /___ _ ___ / /_ (_)____ ___ ___  ___ _ ____ ____ / /  """ + "\n"
+    + """ / -_)/ // _ `/(_-</ __// // __/(_-</ -_)/ _ `// __// __// _ \ """ + "\n"
+    + """ \__//_/ \_,_//___/\__//_/ \__//___/\__/ \_,_//_/   \__//_//_/ """ + "\n\n"
+  )
+  
+  val settings = scala.collection.mutable.Map[String, String](
+    "host" -> "http://localhost:9200"
+  )
 
-    //settings.put("host", "http://localhost:9200")
+  val terminal = TerminalBuilder.terminal()
+  val reader = LineReaderBuilder.builder()
+    .terminal(terminal)
+    .completer(Completions.completer)
+    .build()
 
-    val terminal = TerminalBuilder.terminal()
-    val reader = LineReaderBuilder.builder()
-      .terminal(terminal)
-      .completer(Completions.completer)
-      .build()
-
-    var read = true
-    while(read) {
-      try {
-        eval(reader.readLine("elasticsearch> "))
-      }
-      catch {
-        case e: UserInterruptException => read = false
-      }
+  var read = true
+  while(read) {
+    try {
+      eval(reader.readLine("elasticsearch> "))
     }
-
+    catch {
+      case e: UserInterruptException => read = false
+    }
   }
 
   def eval(input: String) {
@@ -44,9 +42,9 @@ object Shell extends App {
   }
 
   def request(input: String) { 
-    Parser.request(input) match { 
+    Parse.request(input) match { 
       case Left(request) => { 
-        val response = Client.getResponse(request)
+        val response = Client.response(request, settings.toMap)
         println(s"\n${request}")
         println(s"Status: ${response.code}\n")
         println(response.body) 
@@ -58,16 +56,24 @@ object Shell extends App {
     }
   }
 
+  def set(input: String) {
+    Parse.setting(input) match {
+      case Left(s) => settings(s._1) = s._2
+      case Right(error) => {
+        println(error + "\n")
+        usage()
+      }
+    }
+  }
+
+  def usage() = println("TODO")
+
   def clear() {
     val ANSI_CLS = "\u001b[2J";
     val ANSI_HOME = "\u001b[H";
     System.out.print(ANSI_CLS + ANSI_HOME);
     System.out.flush();
   }
-
-  def set(input: String) = println("TODO")
-
-  def usage() = println("TODO")
 
   def exit() = throw new UserInterruptException("")
 
