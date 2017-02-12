@@ -1,3 +1,6 @@
+import org.jline.reader._
+import org.jline.terminal._
+
 object Shell extends App {
   var settings = scala.collection.mutable.Map[String, String]()
 
@@ -11,52 +14,59 @@ object Shell extends App {
 
     //settings.put("host", "http://localhost:9200")
 
-    var read = true
-    while(read) {
-      print("elasticsearch> ")
-      val input = readLine()
-      read = input != null
-      if (read) eval(input)
-    }
-  }
+    val terminal = TerminalBuilder.terminal()
+    val reader = LineReaderBuilder.builder()
+      .terminal(terminal)
+      .build()
 
-  // _search
-  // _search body
-  // GET _search
-  // GET _search body
-  // set host http://localhost:9200
-  // set user elastic
-  // set password changeMe
-  // help
+    while(true) {
+      try {
+        eval(reader.readLine("elasticsearch> "))
+      }
+      catch {
+        case e: UserInterruptException => sys.exit(0)
+      }
+    }
+
+  }
 
   def eval(input: String) {
     var command = input.split(" ")(0)
     command.toLowerCase match {
       case "set" => set(input)
       case "help" => usage()
-      case "exit" => sys.exit(0)
-      case _ => {
-        Parser.request(input) match {
-          case Left(request) => { 
-            val response = Client.getResponse(request)
-            println(s"\n${request}")
-            println(s"Status: ${response.code}\n")
-            println(response.body)
-          }
-          case Right(error) => {
-            println(s"\n${error}\n")
-            usage()
-          }
-        }
+      case "clear" => clear()
+      case "exit" => exit()
+      case _ => request(input)
+    }
+  }
+
+  def request(input: String) { 
+    Parser.request(input) match { 
+      case Left(request) => { 
+        val response = Client.getResponse(request)
+        println(s"\n${request}")
+        println(s"Status: ${response.code}\n")
+        println(response.body) 
+      }
+      case Right(error) => {
+        println(s"\n${error}\n") 
+        usage()
       }
     }
   }
 
-  def set(input: String) {
-    println("TODO")
+  def clear() {
+    val ANSI_CLS = "\u001b[2J";
+    val ANSI_HOME = "\u001b[H";
+    System.out.print(ANSI_CLS + ANSI_HOME);
+    System.out.flush();
   }
 
-  def usage() {
-    println("TODO")
-  }
+  def set(input: String) = println("TODO")
+
+  def usage() = println("TODO")
+
+  def exit() = sys.exit(0)
+
 }
