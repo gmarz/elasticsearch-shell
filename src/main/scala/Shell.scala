@@ -17,6 +17,7 @@ object Shell extends App {
     val terminal = TerminalBuilder.terminal()
     val reader = LineReaderBuilder.builder()
       .terminal(terminal)
+      .completer(Completions.completer)
       .build()
 
     var read = true
