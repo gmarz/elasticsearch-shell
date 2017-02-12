@@ -44,13 +44,19 @@ object Shell extends App {
   def request(input: String) { 
     Parse.request(input) match { 
       case Left(request) => { 
-        val response = Client.response(request, settings.toMap)
-        println(s"\n${request}")
-        println(s"Status: ${response.code}\n")
-        println(response.body) 
+        Client.response(request, settings.toMap) match {
+          case Left(response) => {
+            println(s"\n${request}")
+            println(s"Status: ${response.code}\n")
+            println(response.body) 
+          }
+          case Right(connectionError) => {
+            println(s"\n${connectionError}\n") 
+          }
+        }
       }
-      case Right(error) => {
-        println(s"\n${error}\n") 
+      case Right(parseError) => {
+        println(s"\n${parseError}\n") 
         usage()
       }
     }
