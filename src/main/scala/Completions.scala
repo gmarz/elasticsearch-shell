@@ -78,7 +78,11 @@ object Completions {
       "PUT",
       "POST",
       "DELETE", 
-      "HEAD"
+      "HEAD",
+      "set",
+      "host",
+      "http://",
+      "https://"
     )
   }
 

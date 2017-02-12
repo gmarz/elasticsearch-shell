@@ -51,12 +51,12 @@ object Shell extends App {
             println(response.body) 
           }
           case Right(connectionError) => {
-            println(s"\n${connectionError}\n") 
+            println(connectionError) 
           }
         }
       }
       case Right(parseError) => {
-        println(s"\n${parseError}\n") 
+        println(parseError) 
         usage()
       }
     }
@@ -66,13 +66,31 @@ object Shell extends App {
     Parse.setting(input) match {
       case Left(s) => settings(s._1) = s._2
       case Right(error) => {
-        println(error + "\n")
+        println(error)
         usage()
       }
     }
   }
 
-  def usage() = println("TODO")
+  def usage() = {
+    println()
+    println("  Usage:")
+    println()
+    println("    Example: PUT foo/bar/1 {\"foo\":\"bar\"}")
+    println("    Example: GET _search")
+    println("    Example: set host http://mynode:9200")
+    println()
+    println("    [verb] [endpoint] [body] : Executes an HTTP request to the given endpoint with an optional body.")
+    println("    [endpoint]               : Executes a GET request to the given endpoint.")
+    println("    set [setting] [value]    : Sets the value for a given setting.")
+    println()
+    println("  Settings:")
+    println()
+    println("    host     : The node URL to connect to. Must begin with http:// or https://.")
+    println("    user     : If using basic authenticatin, the user name to connect to Elasticsearch.")
+    println("    password : The password for the given user.")
+    println()
+  }
 
   def clear() {
     val ANSI_CLS = "\u001b[2J";
@@ -84,3 +102,4 @@ object Shell extends App {
   def exit() = throw new UserInterruptException("")
 
 }
+
