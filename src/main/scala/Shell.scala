@@ -19,12 +19,13 @@ object Shell extends App {
       .terminal(terminal)
       .build()
 
-    while(true) {
+    var read = true
+    while(read) {
       try {
         eval(reader.readLine("elasticsearch> "))
       }
       catch {
-        case e: UserInterruptException => sys.exit(0)
+        case e: UserInterruptException => read = false
       }
     }
 
@@ -67,6 +68,6 @@ object Shell extends App {
 
   def usage() = println("TODO")
 
-  def exit() = sys.exit(0)
+  def exit() = throw new UserInterruptException("")
 
 }
