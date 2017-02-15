@@ -7,7 +7,7 @@ case class Error(message: String) {
 
 }
 
-class ParseError(arg: String, from: String) extends Error(s"Failed while trying to parse ${arg} from '${from}'")
+class ParseError(message: String) extends Error(s"Failed to parse command - ${message}")
 
 class UnknownSettingError(name: String) extends Error(s"Unknown setting: ${name}")
 
