@@ -1,7 +1,7 @@
 import org.jline.reader._
 import org.jline.terminal._
 
-object Shell extends App {
+object Main extends App {
 
   println("\n"
     + """        __           __   _                                __  """ + "\n"
