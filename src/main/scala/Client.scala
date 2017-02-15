@@ -2,16 +2,16 @@ import scalaj.http._
 
 object Client {
 
-  def response(r: Request, s: Map[String, String]) : Either[HttpResponse[String], Error] = {
+  def response(r: Request, settings: Map[String, String]) : Either[HttpResponse[String], Error] = {
     try {
       val responseAsString = r.method.toUpperCase match {
-        case "PUT" => put(r, s)
-        case "POST" => post(r, s)
-        case _ => request(r, s).asString
+        case "PUT" => put(r, settings)
+        case "POST" => post(r, settings)
+        case _ => request(r, settings).asString
       }
       Left(responseAsString)
     } catch {
-      case e: java.net.UnknownHostException => Right(new ConnectionError(s("host")))
+      case e: Exception => Right(new ConnectionError(settings("host"), s"${e.getMessage}"))
     }
   }
 
